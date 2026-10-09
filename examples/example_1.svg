@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- 예시 1: 보라 바탕에 흰 동그라미 -->
+  <rect x="0" y="0" width="1024" height="1024" fill="#6155f5"/>
+  <circle cx="512" cy="512" r="260" fill="#fff"/>
+  <circle cx="512" cy="512" r="120" fill="#6155f5"/>
+</svg>

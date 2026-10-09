@@ -1,0 +1,15 @@
+{
+  "name": "icon-preview",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "앱 아이콘을 실제 iPhone 홈 화면에 놓아 보며 디자인을 확인하는 미리보기 도구",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node serve.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.4"
+  }
+}

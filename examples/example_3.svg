@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- 예시 3: 검정 바탕에 색 막대 세 개 -->
+  <rect x="0" y="0" width="1024" height="1024" fill="#111"/>
+  <rect x="232" y="420" width="140" height="372" rx="70" fill="#30d158"/>
+  <rect x="442" y="232" width="140" height="560" rx="70" fill="#fee500"/>
+  <rect x="652" y="332" width="140" height="460" rx="70" fill="#0a84ff"/>
+</svg>

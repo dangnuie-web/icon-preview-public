@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>앱 아이콘 미리보기</title>
+  <style>
+    /* 아이폰 홈 화면을 흉내 내는 확인용 페이지. 값들은 아이폰 것을 따른다 (아이콘 60pt, 글자 11pt, 옆 여백 27pt) */
+    :root {
+      --ink: #000;
+      --muted: #777;
+      --line: #e5e5e5;
+      --surface: #f4f4f4;
+      --accent: #6155f5;
+      --danger: #ff2d55;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 40px 20px 60px;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", system-ui, sans-serif;
+      color: var(--ink);
+      background: #fff;
+      -webkit-text-size-adjust: 100%;
+    }
+    main { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    h2 { font-size: 20px; margin: 0; }
+    p { margin: 0; line-height: 1.5; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    section { display: flex; flex-direction: column; gap: 12px; }
+    button { font: inherit; cursor: pointer; }
+    .btn { height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: var(--ink); color: #fff; font-size: 15px; font-weight: 600; }
+    .seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; font-size: 15px; }
+    .seg button { padding: 6px 12px; border: 0; background: #fff; color: var(--ink); }
+    .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+    /* 시안 줄 — 흰 시안도 보이게 옅은 바탕 */
+    .strip { display: flex; gap: 16px; overflow-x: auto; margin: 0 -20px; padding: 12px 20px 8px; background: var(--surface); list-style: none; }
+    .strip li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; width: 84px; }
+    .strip .pick { padding: 4px; border: 0; border-radius: 12px; background: transparent; }
+    .strip .pick[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--accent); }
+    .strip .name { font-size: 11px; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .strip .num { font-size: 13px; color: var(--ink); font-weight: 600; }
+    .strip .remove { position: absolute; top: -4px; right: 6px; width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--ink); color: #fff; font-size: 13px; line-height: 1; }
+
+    /* 아이폰 아이콘 모양. 아이폰은 투명한 곳을 검게 칠하므로 바탕을 검게 둔다 */
+    .squircle { flex-shrink: 0; overflow: hidden; background: #000; clip-path: url(#ios-squircle); }
+    .squircle img { display: block; width: 100%; height: 100%; }
+
+    /* 가짜 홈 화면 */
+    .phone { max-width: 390px; margin: 0 auto; width: 100%; border-radius: 32px; padding: 12px 27px 16px; display: flex; flex-direction: column; }
+    .phone.dark { background: linear-gradient(#4d4a50, #3c3640 50%, #000); color: #fff; }
+    .phone.light { background: linear-gradient(#fff, #fbfbfb 50%, #f2f2f2); color: #000; border: 1px solid var(--line); }
+    .status { display: flex; justify-content: space-between; align-items: center; height: 32px; font-size: 13px; font-weight: 600; }
+    .grid { display: grid; grid-template-columns: repeat(4, 60px); justify-content: space-between; row-gap: 24px; padding-top: 16px; list-style: none; margin: 0; padding-left: 0; }
+    .grid li { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 60px; }
+    .grid .label { font-size: 11px; line-height: 1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .filler { display: flex; align-items: center; justify-content: center; }
+    .filler span { width: 33%; height: 33%; border-radius: 50%; background: rgba(255,255,255,.4); }
+    .dots { display: flex; justify-content: center; gap: 8px; padding: 20px 0; }
+    .dots span { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .dots span + span { opacity: .3; }
+    .dock { display: flex; justify-content: space-around; padding: 16px 8px; border-radius: 32px; list-style: none; margin: 0; backdrop-filter: blur(20px); }
+    .dark .dock { background: rgba(255,255,255,.15); }
+    .light .dock { background: rgba(0,0,0,.1); }
+
+    .install { font-size: 15px; font-weight: 600; color: var(--accent); }
+    .big { display: flex; align-items: flex-end; justify-content: center; gap: 24px; padding: 24px 0; border-radius: 32px; background: var(--surface); }
+    .big > div { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .checker { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: repeating-conic-gradient(#d9d9d9 0% 25%, #fff 0% 50%) 0 0 / 16px 16px; }
+    .checker img { display: block; width: 120px; height: 120px; }
+    .message { color: var(--danger); font-size: 13px; }
+    .name-field { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+    .name-field input { flex: 1; min-width: 0; height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 16px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <svg style="position:absolute;width:0;height:0" aria-hidden="true">
+    <defs><clipPath id="ios-squircle" clipPathUnits="objectBoundingBox"><path id="squircle-path"></path></clipPath></defs>
+  </svg>
+
+  <main>
+    <header>
+      <h1>앱 아이콘 미리보기</h1>
+      <p class="muted">내 앱 아이콘을 아이폰 홈 화면 모양에 넣어 본다. 그림 추가로 넣은 그림과 앱 이름은 이 기기의 브라우저에만 남고, 서버에는 올라가지 않는다</p>
+    </header>
+
+    <section>
+      <div class="row">
+        <h2 id="count">시안</h2>
+        <button class="btn" id="add">그림 추가</button>
+        <input id="file" type="file" accept="image/*" multiple class="hidden">
+      </div>
+      <ul class="strip" id="strip"></ul>
+      <label class="name-field">앱 이름 <input id="app-name" type="text" maxlength="20" placeholder="앱 이름" autocomplete="off"></label>
+      <p class="muted" id="strip-note"></p>
+      <p class="message hidden" id="message"></p>
+    </section>
+
+    <section>
+      <div class="row">
+        <h2>홈 화면</h2>
+        <div class="seg" id="wallpaper">
+          <button data-wallpaper="dark" aria-pressed="true">어두운 배경</button>
+          <button data-wallpaper="light" aria-pressed="false">밝은 배경</button>
+        </div>
+      </div>
+      <div class="phone dark" id="phone"></div>
+      <p id="install-slot"></p>
+    </section>
+
+    <section id="big-section" class="hidden">
+      <h2>크게 보기</h2>
+      <div class="big">
+        <div><div class="squircle" style="width:120px;height:120px"><img id="big-masked" alt=""></div><span class="muted">홈 화면에 놓일 모양</span></div>
+        <div><div class="checker"><img id="big-raw" alt=""></div><span class="muted">내보낸 그대로</span></div>
+      </div>
+      <p class="muted">투명한 곳은 아이폰이 검게 칠해요. 모서리는 아이폰이 알아서 둥글리니, 시안은 꽉 찬 네모로 내보내면 돼요.</p>
+    </section>
+  </main>
+
+  <script>
+    // ---- 아이폰 아이콘 모양(스쿼클). |x|ⁿ + |y|ⁿ = 1 인 초타원을 n=5 로 그린 것 ----
+    (function () {
+      const n = 5, total = 96, points = [];
+      for (let i = 0; i < total; i++) {
+        const t = (i / total) * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+        const x = 0.5 + 0.5 * Math.sign(c) * Math.abs(c) ** (2 / n);
+        const y = 0.5 + 0.5 * Math.sign(s) * Math.abs(s) ** (2 / n);
+        points.push(x.toFixed(4) + " " + y.toFixed(4));
+      }
+      document.getElementById("squircle-path").setAttribute("d", "M" + points.join("L") + "Z");
+    })();
+
+    // ---- 상태 ----
+    const STORAGE_KEY = "icon-preview.candidates";
+    const NAME_KEY = "icon-preview.appName";
+    const CANDIDATE_SIDE = 360; // 60pt × 3배 화면 = 180px, 크게 보기 120pt 까지 감안
+    let appName = "앱 이름";
+    let builtIn = [];   // 예시 아이콘(examples/) — build.mjs 가 만든 examples.json
+    let uploaded = [];  // 이 브라우저에서 넣은 그림 — localStorage. 서버로 보내지 않는다
+    let selectedId = null;
+    let wallpaper = "dark";
+
+    function readUploaded() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
+    }
+    function writeUploaded(list) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); uploaded = list; return true; } catch { return false; }
+    }
+    function all() { return [...builtIn, ...uploaded]; }
+    function selected() { return all().find((c) => c.id === selectedId) || all()[0]; }
+
+    // 고른 그림을 정사각형으로 줄인다. 투명한 곳은 그대로 둔다 — 아이폰 모양으로 보여줄 때만 검정을 깐다
+    async function toCandidate(file) {
+      const bitmap = await createImageBitmap(file);
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = CANDIDATE_SIDE;
+      const side = Math.min(bitmap.width, bitmap.height);
+      canvas.getContext("2d").drawImage(bitmap, (bitmap.width - side) / 2, (bitmap.height - side) / 2, side, side, 0, 0, CANDIDATE_SIDE, CANDIDATE_SIDE);
+      bitmap.close();
+      return { id: crypto.randomUUID(), src: canvas.toDataURL("image/png"), name: file.name.replace(/\.[^.]+$/, "") };
+    }
+
+    // ---- 그리기 ----
+    const FILLER_NAMES = ["메시지", "캘린더", "사진", "카메라", "메일", "시계", "지도", "날씨", "메모", "음악", "설정", "지갑", "건강", "파일", "연락처", "계산기", "팟캐스트", "주식", "번역", "책", "전화", "브라우저", "알림", "게임", "쇼핑", "은행", "택시", "배달"];
+    const FILLER_TONES = ["#ff2d55", "#777", "#6155f5", "#c1c1c1", "#fee500", "#4d4a50", "#fff", "#d9d9d9"];
+    const GRID_SLOTS = 24, CANDIDATE_SLOT = 5, DOCK_SLOTS = 4, CANDIDATE_DOCK_SLOT = 2;
+
+    function squircle(src, size) {
+      const box = document.createElement("div");
+      box.className = "squircle";
+      box.style.width = box.style.height = size + "px";
+      if (src) { const img = document.createElement("img"); img.src = src; img.alt = ""; img.draggable = false; box.appendChild(img); }
+      return box;
+    }
+    function filler(index, size) {
+      const box = squircle(null, size);
+      box.classList.add("filler");
+      box.style.background = FILLER_TONES[index % FILLER_TONES.length];
+      box.appendChild(document.createElement("span"));
+      return box;
+    }
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function renderStrip() {
+      const list = all(), current = selected();
+      document.getElementById("count").textContent = "아이콘 " + list.length + "개";
+      const strip = document.getElementById("strip");
+      strip.replaceChildren(...list.map((c, i) => {
+        const li = el("li");
+        const pick = el("button", "pick");
+        pick.setAttribute("aria-pressed", String(c === current));
+        pick.setAttribute("aria-label", (i + 1) + "번 아이콘 고르기");
+        pick.appendChild(squircle(c.src, 64));
+        pick.onclick = () => { selectedId = c.id; render(); };
+        li.append(pick, el("span", "num", String(i + 1)), el("span", "name", c.name || ""));
+        if (!c.builtIn) {
+          const remove = el("button", "remove", "×");
+          remove.setAttribute("aria-label", (i + 1) + "번 아이콘 지우기");
+          remove.onclick = () => { writeUploaded(uploaded.filter((u) => u.id !== c.id)); render(); };
+          li.appendChild(remove);
+        }
+        return li;
+      }));
+      document.getElementById("strip-note").textContent = builtIn.length
+        ? "1~" + builtIn.length + "번은 예시예요. 내 아이콘은 PNG 로 내보내 사진첩에 넣고 그림 추가로 골라 보세요 — 이 기기의 브라우저에만 남아요."
+        : "내 아이콘을 PNG 로 내보내 사진첩에 넣고 그림 추가로 골라 보세요 — 이 기기의 브라우저에만 남아요.";
+    }
+
+    function renderPhone() {
+      const current = selected();
+      const phone = document.getElementById("phone");
+      phone.className = "phone " + wallpaper;
+
+      const status = el("div", "status");
+      status.append(el("span", null, "9:41"), el("span", null, "●●●"));
+
+      const grid = el("ul", "grid");
+      for (let i = 0; i < GRID_SLOTS; i++) {
+        const li = el("li");
+        li.append(i === CANDIDATE_SLOT ? squircle(current && current.src, 60) : filler(i, 60), el("span", "label", i === CANDIDATE_SLOT ? appName : FILLER_NAMES[i]));
+        grid.appendChild(li);
+      }
+      const dots = el("div", "dots"); dots.append(el("span"), el("span"));
+      const dock = el("ul", "dock");
+      for (let i = 0; i < DOCK_SLOTS; i++) {
+        const li = el("li");
+        li.appendChild(i === CANDIDATE_DOCK_SLOT ? squircle(current && current.src, 60) : filler(GRID_SLOTS + i, 60));
+        dock.appendChild(li);
+      }
+      phone.replaceChildren(status, grid, dots, dock);
+
+      const slot = document.getElementById("install-slot");
+      slot.className = "";
+      if (current && current.builtIn) {
+        const a = el("a", "install", "예시 " + current.builtIn + "번을 진짜 홈 화면에 깔아 보기 →");
+        a.href = "install/" + current.builtIn + "/";
+        slot.replaceChildren(a);
+      } else if (current) {
+        // 내 그림은 서버에 파일이 없어서, 설치 페이지가 브라우저 저장소에서 꺼내 아이콘으로 단다. 아이폰이 이걸 받아 주는지는 아직 확인 전
+        const a = el("a", "install", "이 그림을 진짜 홈 화면에 깔아 보기 (시험 중) →");
+        a.href = "install/mine/?id=" + encodeURIComponent(current.id);
+        const note = el("span", "muted", " 아이폰이 기기 안 그림을 아이콘으로 받아 주는지 아직 확인하지 못했어요. 안 되면 아이콘 대신 페이지 캡처가 깔려요.");
+        note.style.display = "block";
+        slot.replaceChildren(a, note);
+      } else {
+        slot.replaceChildren();
+      }
+    }
+
+    function renderBig() {
+      const current = selected();
+      document.getElementById("big-section").classList.toggle("hidden", !current);
+      if (!current) return;
+      document.getElementById("big-masked").src = current.src;
+      document.getElementById("big-raw").src = current.src;
+    }
+
+    function render() { renderStrip(); renderPhone(); renderBig(); }
+
+    // ---- 이벤트 ----
+    document.getElementById("add").onclick = () => document.getElementById("file").click();
+    document.getElementById("file").onchange = async (e) => {
+      const files = Array.from(e.target.files || []);
+      e.target.value = "";
+      if (!files.length) return;
+      const message = document.getElementById("message");
+      message.classList.add("hidden");
+      try {
+        const added = await Promise.all(files.map(toCandidate));
+        if (!writeUploaded([...uploaded, ...added])) {
+          message.textContent = "브라우저 저장 공간이 모자라요. 안 쓰는 시안을 지우고 다시 넣어 주세요.";
+          message.classList.remove("hidden");
+        } else {
+          selectedId = added[0].id;
+        }
+      } catch {
+        message.textContent = "그림을 읽지 못했어요. PNG 나 JPG 로 다시 내보내 주세요.";
+        message.classList.remove("hidden");
+      }
+      render();
+    };
+    document.getElementById("wallpaper").onclick = (e) => {
+      const button = e.target.closest("button[data-wallpaper]");
+      if (!button) return;
+      wallpaper = button.dataset.wallpaper;
+      document.querySelectorAll("#wallpaper button").forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+      renderPhone();
+    };
+
+    // ---- 시작 ----
+    (async () => {
+      try {
+        const data = await (await fetch("examples.json", { cache: "no-store" })).json();
+        appName = data.appName || appName;
+        // 배포 표식(버전)을 붙여, 같은 이름으로 그림만 바뀌어도 브라우저가 옛 그림을 다시 쓰지 않게 한다
+        builtIn = data.examples.map((c) => ({ id: "built-in-" + c.n, builtIn: c.n, name: c.name, src: "examples/" + c.n + ".png?v=" + (data.version || "") }));
+      } catch {
+        builtIn = [];
+      }
+      uploaded = readUploaded();
+      try { appName = localStorage.getItem(NAME_KEY) || appName; } catch {}
+      const nameInput = document.getElementById("app-name");
+      nameInput.value = appName;
+      nameInput.oninput = () => {
+        appName = nameInput.value.trim() || "앱 이름";
+        try { localStorage.setItem(NAME_KEY, nameInput.value.trim()); } catch {}
+        renderPhone();
+      };
+      render();
+    })();
+  </script>
+</body>
+</html>

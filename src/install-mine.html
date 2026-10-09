@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>앱 이름</title>
+  <!-- 내 그림은 서버에 파일이 없다. 아래 스크립트가 이 기기의 브라우저 저장소에서 그림을 꺼내 data: 주소로 apple-touch-icon 을 단다.
+       아이폰 사파리가 data: 주소 아이콘을 받아 주는지는 아직 실기기에서 확인하지 못했다 (README "내 그림 깔아 보기" 참고) -->
+  <script>
+    (function () {
+      const id = new URLSearchParams(location.search).get("id");
+      let item = null, name = "";
+      try {
+        item = JSON.parse(localStorage.getItem("icon-preview.candidates") || "[]").find((c) => c.id === id) || null;
+        name = localStorage.getItem("icon-preview.appName") || "";
+      } catch {}
+      window.__mine = { item, name };
+      if (name) document.title = name;
+      if (item) {
+        const link = document.createElement("link");
+        link.rel = "apple-touch-icon";
+        link.href = item.src;
+        document.head.appendChild(link);
+      }
+    })();
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px 20px 60px; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", system-ui, sans-serif; color: #000; background: #fff; }
+    main { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+    a.back { color: #777; font-size: 15px; text-decoration: none; }
+    h1 { font-size: 20px; margin: 4px 0 0; }
+    .hero { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0; border-radius: 32px; background: linear-gradient(#4d4a50, #000); color: #fff; font-size: 15px; }
+    .squircle { width: 120px; height: 120px; overflow: hidden; background: #000; clip-path: url(#ios-squircle); }
+    .squircle img { display: block; width: 100%; height: 100%; }
+    ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+    ol li { display: flex; gap: 12px; font-size: 16px; line-height: 1.6; }
+    ol li b { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #000; color: #fff; font-size: 15px; }
+    p.muted { margin: 0; color: #777; font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <svg style="position:absolute;width:0;height:0" aria-hidden="true">
+    <defs><clipPath id="ios-squircle" clipPathUnits="objectBoundingBox"><path id="squircle-path"></path></clipPath></defs>
+  </svg>
+  <main>
+    <header>
+      <a class="back" href="../../">← 아이콘 미리보기</a>
+      <h1>내 그림을 진짜 홈 화면에 깔아 보기 (시험 중)</h1>
+    </header>
+    <p class="muted" id="missing" hidden>이 기기의 브라우저에서 그림을 찾지 못했어요. 미리보기 화면으로 돌아가 그림 추가로 다시 넣어 주세요. (그림은 넣은 기기·브라우저에만 남아요)</p>
+    <div class="hero" id="hero" hidden>
+      <div class="squircle"><img id="icon" alt=""></div>
+      <span id="app-name">앱 이름</span>
+    </div>
+    <p class="muted"><b>아직 확인하지 못한 기능이에요.</b> 아이폰은 홈 화면 아이콘을 보통 서버에 있는 그림 파일 주소로 읽어요. 이 그림은 서버에 없고 이 기기 안에만 있어서, 아이폰이 받아 주지 않으면 아이콘 대신 이 페이지를 찍은 모양이 깔려요. 그래도 예시 아이콘은 진짜로 깔아 볼 수 있어요.</p>
+    <ol>
+      <li><b>1</b><span>이 페이지를 아이폰 사파리에서 연다 (카톡 안의 브라우저면 오른쪽 아래 사파리 버튼으로 나간다)</span></li>
+      <li><b>2</b><span>화면 아래 가운데의 공유 버튼(네모에서 화살표가 올라오는 모양)을 누른다</span></li>
+      <li><b>3</b><span>목록을 내려 "홈 화면에 추가"를 누른다</span></li>
+      <li><b>4</b><span>이름을 확인하고 오른쪽 위 "추가"</span></li>
+      <li><b>5</b><span>홈 화면 맨 뒤 페이지에 생긴 아이콘을 본다. 다 봤으면 길게 눌러 "북마크 삭제"</span></li>
+    </ol>
+  </main>
+  <script>
+    const { item, name } = window.__mine;
+    if (item) {
+      document.getElementById("icon").src = item.src;
+      if (name) document.getElementById("app-name").textContent = name;
+      document.getElementById("hero").hidden = false;
+    } else {
+      document.getElementById("missing").hidden = false;
+    }
+    (function () {
+      const n = 5, total = 96, points = [];
+      for (let i = 0; i < total; i++) {
+        const t = (i / total) * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+        points.push((0.5 + 0.5 * Math.sign(c) * Math.abs(c) ** (2 / n)).toFixed(4) + " " + (0.5 + 0.5 * Math.sign(s) * Math.abs(s) ** (2 / n)).toFixed(4));
+      }
+      document.getElementById("squircle-path").setAttribute("d", "M" + points.join("L") + "Z");
+    })();
+  </script>
+</body>
+</html>

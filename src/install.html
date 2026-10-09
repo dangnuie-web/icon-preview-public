@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <!-- 홈 화면에 놓일 이름은 이 title 에서 온다. 진짜 앱과 같아 보이도록 앱 이름 그대로 둔다 -->
+  <title>{{APP_NAME}}</title>
+  <!-- 아이폰은 "홈 화면에 추가"할 때 이 그림을 아이콘으로 쓴다. build.mjs 가 시안마다 이 페이지를 하나씩 만든다 -->
+  <link rel="apple-touch-icon" href="../../examples/{{N}}.png?v={{VERSION}}">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px 20px 60px; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", system-ui, sans-serif; color: #000; background: #fff; }
+    main { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+    a.back { color: #777; font-size: 15px; text-decoration: none; }
+    h1 { font-size: 20px; margin: 4px 0 0; }
+    .hero { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0; border-radius: 32px; background: linear-gradient(#4d4a50, #000); color: #fff; font-size: 15px; }
+    .squircle { width: 120px; height: 120px; overflow: hidden; background: #000; clip-path: url(#ios-squircle); }
+    .squircle img { display: block; width: 100%; height: 100%; }
+    ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+    ol li { display: flex; gap: 12px; font-size: 16px; line-height: 1.6; }
+    ol li b { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #000; color: #fff; font-size: 15px; }
+    p.muted { margin: 0; color: #777; font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <svg style="position:absolute;width:0;height:0" aria-hidden="true">
+    <defs><clipPath id="ios-squircle" clipPathUnits="objectBoundingBox"><path id="squircle-path"></path></clipPath></defs>
+  </svg>
+  <main>
+    <header>
+      <a class="back" href="../../">← 아이콘 미리보기</a>
+      <h1>예시 {{N}}번을 진짜 홈 화면에 깔아 보기</h1>
+    </header>
+    <div class="hero">
+      <div class="squircle"><img src="../../examples/{{N}}.png?v={{VERSION}}" alt=""></div>
+      <span class="app-name">{{APP_NAME}}</span>
+    </div>
+    <ol>
+      <li><b>1</b><span>이 페이지를 아이폰 사파리에서 연다 (카톡 안의 브라우저면 오른쪽 아래 사파리 버튼으로 나간다)</span></li>
+      <li><b>2</b><span>화면 아래 가운데의 공유 버튼(네모에서 화살표가 올라오는 모양)을 누른다</span></li>
+      <li><b>3</b><span>목록을 내려 "홈 화면에 추가"를 누른다</span></li>
+      <li><b>4</b><span>이름을 확인하고 오른쪽 위 "추가"</span></li>
+      <li><b>5</b><span>홈 화면 맨 뒤 페이지에 아이콘이 생긴다. 다 봤으면 길게 눌러 "북마크 삭제"</span></li>
+    </ol>
+    <p class="muted">여러 개를 깔면 이름이 같아 헷갈릴 수 있어요. 구분하려면 4번에서 이름 뒤에 번호를 붙여도 돼요.</p>
+  </main>
+  <script>
+    // 미리보기 화면에서 정한 앱 이름(이 기기에만 저장)이 있으면 그걸 쓴다. 홈 화면에 놓일 이름은 title 에서 온다
+    try {
+      const name = localStorage.getItem("icon-preview.appName");
+      if (name) { document.title = name; document.querySelector(".app-name").textContent = name; }
+    } catch {}
+    (function () {
+      const n = 5, total = 96, points = [];
+      for (let i = 0; i < total; i++) {
+        const t = (i / total) * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+        points.push((0.5 + 0.5 * Math.sign(c) * Math.abs(c) ** (2 / n)).toFixed(4) + " " + (0.5 + 0.5 * Math.sign(s) * Math.abs(s) ** (2 / n)).toFixed(4));
+      }
+      document.getElementById("squircle-path").setAttribute("d", "M" + points.join("L") + "Z");
+    })();
+  </script>
+</body>
+</html>
